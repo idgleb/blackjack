@@ -17,7 +17,4 @@ El Black Jack es un juego de azar que también implica estrategia, ya que los ju
 ![Screenshot_20241029_153901_BlackJack Argentina](https://github.com/user-attachments/assets/0a25f12c-524e-42ad-a2cf-86a0b62eed25)
 ![Screenshot_20241029_153836_BlackJack Argentina](https://github.com/user-attachments/assets/f2c7983e-d844-4868-89fa-71670b3ece22)
 ![Screenshot_20241029_153713_BlackJack Argentina](https://github.com/user-attachments/assets/4d0a1808-452c-406f-aa3f-ce832eea30f8)
-![Screenshot_20241029_153656_BlackJack Argentina](https://github.com/user-attachments/assets/00f434b6-e4d7-4f0a-975a-82189a9ee347)
-![Screenshot_20241029_153648_BlackJack Argentina](https://github.com/user-attachments/assets/74760bd2-3eb5-4766-b27d-5d7e2c7b7256)
-![Screenshot_20241029_153635_BlackJack Argentina](https://github.com/user-attachments/assets/4fe80782-23d8-4dd6-99a6-548aedc40d66)
-![11](https://github.com/user-attachments/assets/6ce605e7-f977-4e6b-a1da-f7e3a63aaf40)
+
