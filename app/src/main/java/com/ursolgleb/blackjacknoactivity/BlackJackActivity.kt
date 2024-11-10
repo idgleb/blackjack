@@ -39,7 +39,6 @@ private var iterDeRenuevo = 0
 
 private var alturaFicha = 0
 private var anchuraFicha = 0
-//var anchuraCarta = 0
 
 private val colorPierdes = Color.parseColor("#710001")
 private val colorGanas = Color.parseColor("#007100")
