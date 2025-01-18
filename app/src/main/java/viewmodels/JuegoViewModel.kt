@@ -24,9 +24,5 @@ class JuegoViewModel() : ViewModel() {
     lateinit var baraja:BarajaDeCartas
 
 
-
-
-
-
 }
 

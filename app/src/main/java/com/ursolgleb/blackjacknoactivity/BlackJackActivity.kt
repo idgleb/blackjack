@@ -24,9 +24,11 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -67,14 +69,10 @@ class BlackJackActivity : AppCompatActivity() {
 
 
     val viewModel: JuegoViewModel by viewModels() // Usando delegation para obtener el ViewModel
-    //var baraja: BarajaDeCartas? = null
-
 
     val duracionFlotarCartas = 400L
     val duracionAbrirCartas = 140L
     val duracionFicas = 2000L
-
-    val HEIGHT_JPANELES_PARA_FICHAS = 420
 
     var coeficienteDeGanancia = 1.0
 
@@ -109,15 +107,19 @@ class BlackJackActivity : AppCompatActivity() {
     lateinit var labelPuntosCrupier: TextView
     lateinit var labelCartasEnBaraja: TextView
     lateinit var butRepartir: Button
+
     lateinit var butMas: Button
     lateinit var butParar: Button
     lateinit var butDoblar: Button
     lateinit var botones_sacar: LinearLayout
-    lateinit var layoutCenter:ConstraintLayout
-    lateinit var imagen_apuesto:ImageView
+    lateinit var layoutCenter: ConstraintLayout
+    lateinit var imagen_apuesto: ImageView
     lateinit var butSacarTodas: Button
     lateinit var butSacarUna: Button
-    lateinit var layoutTop:ConstraintLayout
+    lateinit var layoutTop: ConstraintLayout
+
+    lateinit var popupWindow: PopupWindow
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -127,7 +129,7 @@ class BlackJackActivity : AppCompatActivity() {
         setContentView(R.layout.activity_black_jack)
         instance = this
 
-        iterDeRenuevo=0
+        iterDeRenuevo = 0
 
         fullScreen()
 
@@ -150,7 +152,7 @@ class BlackJackActivity : AppCompatActivity() {
         botones_sacar = findViewById(R.id.botones_sacar)
         layoutCenter = findViewById(R.id.layoutCenter)
         imagen_apuesto = findViewById(R.id.imagen_apuesto)
-        butSacarTodas  = findViewById(R.id.butSacarTodas)
+        butSacarTodas = findViewById(R.id.butSacarTodas)
         butSacarUna = findViewById(R.id.butSacarUna)
         layoutTop = findViewById(R.id.layoutTop)
 
@@ -188,7 +190,8 @@ class BlackJackActivity : AppCompatActivity() {
         soundIdabrir = soundPool.load(this, R.raw.abrir, 1)
 
 
-        var listaJugdores: MutableList<Jugador> = mutableListOf(viewModel.jugador1, viewModel.crupier)
+        var listaJugdores: MutableList<Jugador> =
+            mutableListOf(viewModel.jugador1, viewModel.crupier)
 
         val butApuesto10: ImageButton = findViewById(R.id.butApuesto10)
         val butApuesto25: ImageButton = findViewById(R.id.butApuesto25)
@@ -196,14 +199,21 @@ class BlackJackActivity : AppCompatActivity() {
         val butApuesto100: ImageButton = findViewById(R.id.butApuesto100)
         val butApuesto500: ImageButton = findViewById(R.id.butApuesto500)
 
+        val popupView = layoutInflater.inflate(R.layout.popup_layout, null)
+        val butReiniciar: Button = popupView.findViewById(R.id.butReiniciar)
 
-
+        popupWindow = PopupWindow(
+            popupView,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            false
+        )
 
         /////////
 
         try {
             viewModel.baraja.cartas.forEach {
-                it.BlackJackActivity= instance
+                it.BlackJackActivity = instance
                 // Obtener el parent actual de la vista
                 val currentParent = it.view.parent as? ViewGroup
 
@@ -229,12 +239,15 @@ class BlackJackActivity : AppCompatActivity() {
             timerSiempre = object : CountDownTimer(timeMillis, 5) {
                 override fun onTick(p0: Long) {
 
+                    gameover()
+
                     val labelInfo: TextView = findViewById(R.id.labelInfo)
                     labelApuesto.text = "$ ${viewModel.jugador1.apuestoJugador}"
                     labelBalance.text = "Balance $${viewModel.jugador1.balanceJugador}"
                     labelPuntosJugador.text = "${viewModel.jugador1.sumaPuntos()}"
                     labelPuntosCrupier.text = "${viewModel.crupier.sumaPuntos()}"
-                    labelCartasEnBaraja.text = "${viewModel.baraja?.cartas?.size} cartas \nen baraja"
+                    labelCartasEnBaraja.text =
+                        "${viewModel.baraja?.cartas?.size} cartas \nen baraja"
                     labelInfo.text =
                         "Apuesta: min:${viewModel.jugador1.APUESTO_MIN}, max:${viewModel.jugador1.APUESTO_MAX}"
 
@@ -313,6 +326,7 @@ class BlackJackActivity : AppCompatActivity() {
                     }
 
                 }
+
                 override fun onFinish() {
 
                     timerSiempre?.start()
@@ -321,7 +335,7 @@ class BlackJackActivity : AppCompatActivity() {
         }
 
         main.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            if ((iterDeRenuevo++)<35){
+            if ((iterDeRenuevo++) < 35) {
                 setBaraja()
                 setBotones()
                 setCoordParaPanelesDeFichas()
@@ -330,7 +344,8 @@ class BlackJackActivity : AppCompatActivity() {
             }
         }
 
-        main.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        main.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
 
             }
@@ -359,9 +374,11 @@ class BlackJackActivity : AppCompatActivity() {
             soundPool.play(soundIdsacarfichas, 1f, 1f, 1, 0, 1f)
 
             val size = viewModel.labelsFichasEnApuesto.size
-            viewModel.jugador1.balanceJugador += viewModel.labelsFichasEnApuesto.last().text.toString().toDouble()
-            viewModel.jugador1.apuestoJugador -= viewModel.labelsFichasEnApuesto.last().text.toString().toDouble()
-            if (jPanelFichasEnApuesto.isNotEmpty()){
+            viewModel.jugador1.balanceJugador += viewModel.labelsFichasEnApuesto.last().text.toString()
+                .toDouble()
+            viewModel.jugador1.apuestoJugador -= viewModel.labelsFichasEnApuesto.last().text.toString()
+                .toDouble()
+            if (jPanelFichasEnApuesto.isNotEmpty()) {
                 jPanelFichasEnApuesto.removeViewAt(size - 1)
             }
             viewModel.labelsFichasEnApuesto.removeLast()
@@ -376,6 +393,15 @@ class BlackJackActivity : AppCompatActivity() {
             viewModel.labelsFichasEnApuesto.clear();
             jPanelFichasEnCrupier.removeAllViews();
         }
+
+
+        butReiniciar.setOnClickListener {
+            prepararMesaParaNuevosPuestos()
+            viewModel.jugador1.balanceJugador = DEFAUL_BALANCE
+            nuevaBaraja()
+            popupWindow.dismiss()
+        }
+
         butRepartir.setOnClickListener {
             butRepartir.visibility = View.INVISIBLE
             if (viewModel.jugador1.apuestoJugador < viewModel.jugador1.APUESTO_MIN) {
@@ -388,6 +414,7 @@ class BlackJackActivity : AppCompatActivity() {
                 viewModel.baraja.repartir(listaJugdores, 2, duracionFlotarCartas)
             }
         }
+
         butMas.setOnClickListener {
             viewModel.isMas = true
             viewModel.baraja.robarCarta()?.let { it1 ->
@@ -397,7 +424,9 @@ class BlackJackActivity : AppCompatActivity() {
                             super.onAnimationEnd(animation)
                             //
                             viewModel.jugador1.cartasQueTiene.add(it1)
-                            if (!(viewModel.jugador1.isCrupier && viewModel.jugador1.cartasQueTiene.size==2))it1.abrirCerarCatra(duracionAbrirCartas)
+                            if (!(viewModel.jugador1.isCrupier && viewModel.jugador1.cartasQueTiene.size == 2)) it1.abrirCerarCatra(
+                                duracionAbrirCartas
+                            )
 
                             if (viewModel.jugador1.sumaPuntos() == 21) {
                                 viewModel.isTurnoCrupier = true
@@ -430,7 +459,9 @@ class BlackJackActivity : AppCompatActivity() {
                                 super.onAnimationEnd(animation)
                                 //
                                 jugador1.cartasQueTiene.add(it1)
-                                if (!(jugador1.isCrupier && jugador1.cartasQueTiene.size==2))it1.abrirCerarCatra(duracionAbrirCartas)
+                                if (!(jugador1.isCrupier && jugador1.cartasQueTiene.size == 2)) it1.abrirCerarCatra(
+                                    duracionAbrirCartas
+                                )
 
                                 if (jugador1.sumaPuntos() > 21) {
                                     resultarJuego(0.0, "Pierdes -${jugador1.apuestoJugador}")
@@ -454,8 +485,20 @@ class BlackJackActivity : AppCompatActivity() {
 
     }
 
+    private fun gameover() {
+        if (!popupWindow.isShowing && viewModel.jugador1.apuestoJugador == 0.0 && viewModel.jugador1.balanceJugador < 100) {
+            popupWindow.showAtLocation(
+                findViewById(android.R.id.content),
+                Gravity.CENTER_VERTICAL,
+                0,
+                0
+            )
+        }
+    }
+
     override fun onPause() {
         super.onPause()
+        SharedApp.prefs.balanceJugador = viewModel.jugador1.balanceJugador.toFloat()
         mediaPlayer.pause()
     }
 
@@ -464,16 +507,8 @@ class BlackJackActivity : AppCompatActivity() {
         mediaPlayer.start()
     }
 
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        // Realizar acciones basadas en el enfoque de la ventana
-
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-
         // Liberar recursos del MediaPlayer
         if (this::mediaPlayer.isInitialized) {
             mediaPlayer.release()
@@ -482,25 +517,26 @@ class BlackJackActivity : AppCompatActivity() {
         soundPool.release()
     }
 
-    private fun setBotones(){
+    private fun setBotones() {
 
         if (main.width <= main.height) {
-            alturaFicha = main.width/10
-            anchuraFicha = main.width/10
+            alturaFicha = main.width / 10
+            anchuraFicha = main.width / 10
         } else {
-            alturaFicha = main.height/14
-            anchuraFicha = main.height/14
+            alturaFicha = main.height / 14
+            anchuraFicha = main.height / 14
         }
 
-        labelPuntosCrupier.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        labelPuntosCrupier.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                if (main.height>=main.width){
+                if (main.height >= main.width) {
                     val x = botones_sacar.x
-                    val y = barajaLeft.y+barajaLeft.height
+                    val y = barajaLeft.y + barajaLeft.height
                     setCoord(labelPuntosCrupier, x, y)
-                }else{
+                } else {
                     val x = botones_sacar.x
-                    val y = barajaLeft.y+barajaLeft.height
+                    val y = barajaLeft.y + barajaLeft.height
                     setCoord(labelPuntosCrupier, x, y)
                 }
                 labelPuntosCrupier.viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -508,15 +544,16 @@ class BlackJackActivity : AppCompatActivity() {
         })
 
 
-        labelPuntosJugador.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        labelPuntosJugador.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                if (main.height>=main.width){
+                if (main.height >= main.width) {
                     val x = botones_sacar.x
-                    val y = botones_sacar.y+botones_sacar.height-labelPuntosJugador.height
+                    val y = botones_sacar.y + botones_sacar.height - labelPuntosJugador.height
                     setCoord(labelPuntosJugador, x, y)
-                }else{
+                } else {
                     val x = botones_sacar.x
-                    val y = botones_sacar.y+botones_sacar.height-labelPuntosJugador.height
+                    val y = botones_sacar.y + botones_sacar.height - labelPuntosJugador.height
                     setCoord(labelPuntosJugador, x, y)
                 }
                 labelPuntosJugador.bringToFront()
@@ -524,24 +561,25 @@ class BlackJackActivity : AppCompatActivity() {
             }
         })
 
-        botones_sacar.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        botones_sacar.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                if (main.height>=main.width){
-                    butSacarTodas.textSize = main.width*0.01f
-                    butSacarUna.textSize = main.width*0.01f
-                    val widthBotSac=(main.width*0.4).toInt()
-                    val heightBotSac=(widthBotSac*0.35).toInt()
+                if (main.height >= main.width) {
+                    butSacarTodas.textSize = main.width * 0.01f
+                    butSacarUna.textSize = main.width * 0.01f
+                    val widthBotSac = (main.width * 0.4).toInt()
+                    val heightBotSac = (widthBotSac * 0.35).toInt()
                     setTamano(botones_sacar, widthBotSac, heightBotSac)
-                    val x = imagen_apuesto.x-botones_sacar.width
+                    val x = imagen_apuesto.x - botones_sacar.width
                     val y = imagen_apuesto.y
                     setCoord(botones_sacar, x, y)
-                }else{
-                    butSacarTodas.textSize = main.height*0.01f
-                    butSacarUna.textSize = main.height*0.01f
-                    val widthBotSac=(main.width*0.4).toInt()
-                    val heightBotSac=(widthBotSac*0.17).toInt()
+                } else {
+                    butSacarTodas.textSize = main.height * 0.01f
+                    butSacarUna.textSize = main.height * 0.01f
+                    val widthBotSac = (main.width * 0.4).toInt()
+                    val heightBotSac = (widthBotSac * 0.17).toInt()
                     setTamano(botones_sacar, widthBotSac, heightBotSac)
-                    val x = imagen_apuesto.x-botones_sacar.width
+                    val x = imagen_apuesto.x - botones_sacar.width
                     val y = imagen_apuesto.y
                     setCoord(botones_sacar, x, y)
                 }
@@ -551,52 +589,54 @@ class BlackJackActivity : AppCompatActivity() {
 
         var widthLinButApuesto: Int
         var heightLinButApuesto: Int
-        var y:Float
-        var x:Float
+        var y: Float
+        var x: Float
 
-        linButApuesto.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        linButApuesto.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                if (main.height>=main.width){
-                    widthLinButApuesto =main.width
-                    heightLinButApuesto=(widthLinButApuesto/5.6).toInt()
+                if (main.height >= main.width) {
+                    widthLinButApuesto = main.width
+                    heightLinButApuesto = (widthLinButApuesto / 5.6).toInt()
                     setTamano(linButApuesto, widthLinButApuesto, heightLinButApuesto)
-                    y= (main.height-heightLinButApuesto).toFloat()
-                    x=((main.width-linButApuesto.width)/2).toFloat()
+                    y = (main.height - heightLinButApuesto).toFloat()
+                    x = ((main.width - linButApuesto.width) / 2).toFloat()
                     setCoord(linButApuesto, x, y)
-                }else{
-                    widthLinButApuesto =(main.width*0.5).toInt()
-                    heightLinButApuesto=(widthLinButApuesto/6.3).toInt()
+                } else {
+                    widthLinButApuesto = (main.width * 0.5).toInt()
+                    heightLinButApuesto = (widthLinButApuesto / 6.3).toInt()
                     setTamano(linButApuesto, widthLinButApuesto, heightLinButApuesto)
-                    y= (main.height-heightLinButApuesto).toFloat()
-                    x=((main.width-linButApuesto.width)/2).toFloat()
+                    y = (main.height - heightLinButApuesto).toFloat()
+                    x = ((main.width - linButApuesto.width) / 2).toFloat()
                     setCoord(linButApuesto, 0f, y)
                 }
                 linButApuesto.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
 
-        linia_botones.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        linia_botones.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
 
-                if (main.height>=main.width){
+                if (main.height >= main.width) {
                     //butRepartir.textSize = main.width*0.008f
                     //butMas.textSize = main.width*0.008f
                     //butParar.textSize = main.width*0.008f
                     //butDoblar.textSize = main.width*0.008f
-                    val widthBotLin=(main.width).toInt()
-                    val heightBotLin=(widthBotLin*0.12).toInt()
+                    val widthBotLin = (main.width).toInt()
+                    val heightBotLin = (widthBotLin * 0.12).toInt()
                     setTamano(linia_botones, widthBotLin, heightBotLin)
 
-                    val x = ((main.width-linia_botones.width)/2).toFloat()
-                    val y = linButApuesto.y-linia_botones.height
+                    val x = ((main.width - linia_botones.width) / 2).toFloat()
+                    val y = linButApuesto.y - linia_botones.height
                     setCoord(linia_botones, x, y)
-                }else{
+                } else {
                     //butRepartir.textSize = main.height*0.008f
                     //butMas.textSize = main.height*0.008f
                     //butParar.textSize = main.height*0.008f
                     //butDoblar.textSize = main.height*0.008f
-                    val widthBotLin=(main.width*0.5).toInt()
-                    val heightBotLin=(widthBotLin*0.15).toInt()
+                    val widthBotLin = (main.width * 0.5).toInt()
+                    val heightBotLin = (widthBotLin * 0.15).toInt()
                     setTamano(linia_botones, widthBotLin, heightBotLin)
 
                     val x = linButApuesto.width.toFloat()
@@ -607,92 +647,107 @@ class BlackJackActivity : AppCompatActivity() {
             }
         })
 
-        labelBalance.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        labelBalance.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                if (main.height>=main.width){
-                    labelBalance.textSize = main.width*0.018f
+                if (main.height >= main.width) {
+                    labelBalance.textSize = main.width * 0.018f
                     val x = 0f
-                    val y = linia_botones.y-labelBalance.height
+                    val y = linia_botones.y - labelBalance.height
                     setCoord(labelBalance, x, y)
-                }else{
-                    labelBalance.textSize = main.height*0.018f
+                } else {
+                    labelBalance.textSize = main.height * 0.018f
                     val x = 0f
-                    val y = linia_botones.y-labelBalance.height
+                    val y = linia_botones.y - labelBalance.height
                     setCoord(labelBalance, x, y)
                 }
                 labelBalance.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
 
-        labelApuesto.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        labelApuesto.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
 
-                if (main.height>=main.width){
-                    labelApuesto.textSize = main.width*0.015f
-                    val x = ((main.width-labelApuesto.width)/2).toFloat()
-                    val y = labelBalance.y-labelApuesto.height
+                if (main.height >= main.width) {
+                    labelApuesto.textSize = main.width * 0.015f
+                    val x = ((main.width - labelApuesto.width) / 2).toFloat()
+                    val y = labelBalance.y - labelApuesto.height
                     setCoord(labelApuesto, x, y)
-                }else{
-                    labelApuesto.textSize = main.height*0.015f
-                    val x = ((main.width-labelApuesto.width)/2).toFloat()
-                    val y = labelBalance.y-labelApuesto.height
+                } else {
+                    labelApuesto.textSize = main.height * 0.015f
+                    val x = ((main.width - labelApuesto.width) / 2).toFloat()
+                    val y = labelBalance.y - labelApuesto.height
                     setCoord(labelApuesto, x, y)
                 }
                 labelApuesto.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
 
-        imagen_apuesto.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        imagen_apuesto.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                if (main.height>=main.width){
-                    setTamano(imagen_apuesto, (anchuraFicha*1.3).toInt(), (anchuraFicha*1.3).toInt())
-                    val x = ((main.width-imagen_apuesto.width)/2).toFloat()
-                    val y = labelApuesto.y-imagen_apuesto.height
+                if (main.height >= main.width) {
+                    setTamano(
+                        imagen_apuesto,
+                        (anchuraFicha * 1.3).toInt(),
+                        (anchuraFicha * 1.3).toInt()
+                    )
+                    val x = ((main.width - imagen_apuesto.width) / 2).toFloat()
+                    val y = labelApuesto.y - imagen_apuesto.height
                     setCoord(imagen_apuesto, x, y)
-                }else{
-                    setTamano(imagen_apuesto, (anchuraFicha*1.3).toInt(), (anchuraFicha*1.3).toInt())
-                    val x = ((main.width-imagen_apuesto.width)/2).toFloat()
-                    val y = labelApuesto.y-imagen_apuesto.height
+                } else {
+                    setTamano(
+                        imagen_apuesto,
+                        (anchuraFicha * 1.3).toInt(),
+                        (anchuraFicha * 1.3).toInt()
+                    )
+                    val x = ((main.width - imagen_apuesto.width) / 2).toFloat()
+                    val y = labelApuesto.y - imagen_apuesto.height
                     setCoord(imagen_apuesto, x, y)
                 }
                 imagen_apuesto.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
 
-        layoutCenter.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        layoutCenter.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
 
-                if (main.height>=main.width){
-                    val heightLayoutCenter = main.height-imagen_apuesto.height-labelApuesto.height-labelBalance.height-linia_botones.height-linButApuesto.height-imgFichasCrupier.height
+                if (main.height >= main.width) {
+                    val heightLayoutCenter =
+                        main.height - imagen_apuesto.height - labelApuesto.height - labelBalance.height - linia_botones.height - linButApuesto.height - imgFichasCrupier.height
                     setTamano(layoutCenter, main.width, heightLayoutCenter)
                     val x = 0f
-                    val y = imagen_apuesto.y-layoutCenter.height
+                    val y = imagen_apuesto.y - layoutCenter.height
                     setCoord(layoutCenter, x, y)
-                }else{
-                    val heightLayoutCenter = main.height-imagen_apuesto.height-labelApuesto.height-labelBalance.height-linButApuesto.height-imgFichasCrupier.height
+                } else {
+                    val heightLayoutCenter =
+                        main.height - imagen_apuesto.height - labelApuesto.height - labelBalance.height - linButApuesto.height - imgFichasCrupier.height
                     setTamano(layoutCenter, main.width, heightLayoutCenter)
                     val x = 0f
-                    val y = imagen_apuesto.y-layoutCenter.height
+                    val y = imagen_apuesto.y - layoutCenter.height
                     setCoord(layoutCenter, x, y)
                 }
                 layoutCenter.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
 
-        imgFichasCrupier.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        imgFichasCrupier.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                if (main.height>=main.width){
-                    val widthImgFichCrup=(main.width*0.5).toInt()
-                    val heightImgFichCrup=(widthImgFichCrup*0.4).toInt()
+                if (main.height >= main.width) {
+                    val widthImgFichCrup = (main.width * 0.5).toInt()
+                    val heightImgFichCrup = (widthImgFichCrup * 0.4).toInt()
                     setTamano(imgFichasCrupier, widthImgFichCrup, heightImgFichCrup)
-                    val x = ((main.width-imgFichasCrupier.width)/2).toFloat()
+                    val x = ((main.width - imgFichasCrupier.width) / 2).toFloat()
                     val y = 0f
                     setCoord(imgFichasCrupier, x, y)
-                }else{
-                    val widthImgFichCrup=(main.height*0.5).toInt()
-                    val heightImgFichCrup=(widthImgFichCrup*0.4).toInt()
+                } else {
+                    val widthImgFichCrup = (main.height * 0.5).toInt()
+                    val heightImgFichCrup = (widthImgFichCrup * 0.4).toInt()
                     setTamano(imgFichasCrupier, widthImgFichCrup, heightImgFichCrup)
-                    val x = ((main.width-imgFichasCrupier.width)/2).toFloat()
+                    val x = ((main.width - imgFichasCrupier.width) / 2).toFloat()
                     val y = 0f
                     setCoord(imgFichasCrupier, x, y)
                 }
@@ -700,20 +755,21 @@ class BlackJackActivity : AppCompatActivity() {
             }
         })
 
-        barajaLeft.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        barajaLeft.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                if (main.height>=main.width){
-                    val widthBarajaLeft=(main.width*0.2).toInt()
-                    val heightBarajaLeft=(widthBarajaLeft*1).toInt()
+                if (main.height >= main.width) {
+                    val widthBarajaLeft = (main.width * 0.2).toInt()
+                    val heightBarajaLeft = (widthBarajaLeft * 1).toInt()
                     setTamano(barajaLeft, widthBarajaLeft, heightBarajaLeft)
-                    val x = imgFichasCrupier.x-barajaLeft.width
+                    val x = imgFichasCrupier.x - barajaLeft.width
                     val y = imgFichasCrupier.y
                     setCoord(barajaLeft, x, y)
-                }else{
-                    val widthBarajaLeft=(main.height*0.2).toInt()
-                    val heightBarajaLeft=(widthBarajaLeft*1).toInt()
+                } else {
+                    val widthBarajaLeft = (main.height * 0.2).toInt()
+                    val heightBarajaLeft = (widthBarajaLeft * 1).toInt()
                     setTamano(barajaLeft, widthBarajaLeft, heightBarajaLeft)
-                    val x = imgFichasCrupier.x-barajaLeft.width
+                    val x = imgFichasCrupier.x - barajaLeft.width
                     val y = imgFichasCrupier.y
                     setCoord(barajaLeft, x, y)
                 }
@@ -722,72 +778,54 @@ class BlackJackActivity : AppCompatActivity() {
         })
 
 
-
-
     }
 
-    private fun setCoordParaPanelesDeFichas(){
+    private fun setCoordParaPanelesDeFichas() {
 
-        jPanelFichasEnApuesto.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        jPanelFichasEnApuesto.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                if (main.height>=main.width){
+                if (main.height >= main.width) {
                     val x = (main.width / 2 - anchuraFicha / 2).toFloat()
-                    val y = (imagen_apuesto.y+imagen_apuesto.height*0.9-jPanelFichasEnApuesto.height).toFloat()
+                    val y =
+                        (imagen_apuesto.y + imagen_apuesto.height * 0.9 - jPanelFichasEnApuesto.height).toFloat()
                     setCoord(jPanelFichasEnApuesto, x, y)
-                }else{
+                } else {
                     val x = (main.width / 2 - anchuraFicha / 2).toFloat()
-                    val y = (imagen_apuesto.y+imagen_apuesto.height*0.9-jPanelFichasEnApuesto.height).toFloat()
+                    val y =
+                        (imagen_apuesto.y + imagen_apuesto.height * 0.9 - jPanelFichasEnApuesto.height).toFloat()
                     setCoord(jPanelFichasEnApuesto, x, y)
                 }
                 jPanelFichasEnApuesto.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
 
-        jPanelFichasEnCrupier.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        jPanelFichasEnCrupier.viewTreeObserver.addOnGlobalLayoutListener(object :
+            ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 val x2 = 0f
-                val y2 = (-jPanelFichasEnCrupier.height/2).toFloat()
+                val y2 = (-jPanelFichasEnCrupier.height / 2).toFloat()
                 setCoord(jPanelFichasEnCrupier, x2, y2)
                 jPanelFichasEnCrupier.viewTreeObserver.removeOnGlobalLayoutListener(this)
             }
         })
 
-
     }
 
-    private fun tamanoPantalla(): Pair<Int, Int> {
-        var screenWidth = 0
-        var screenHeight = 0
-        val displayMetrics = DisplayMetrics()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            val windowMetrics = windowManager.currentWindowMetrics
-            val bounds = windowMetrics.bounds
-            screenWidth = bounds.width()
-            screenHeight = bounds.height()
-        } else {
-            @Suppress("DEPRECATION")
-            windowManager.defaultDisplay.getMetrics(displayMetrics)
-            screenWidth = displayMetrics.widthPixels
-            screenHeight = displayMetrics.heightPixels
-        }
-        return Pair(screenWidth, screenHeight)
-    }
 
-    private fun setBaraja(){
+    private fun setBaraja() {
         if (main.width <= main.height) {
             anchuraCarta = main.width / 6
         } else {
             anchuraCarta = (main.height / 8).toInt()
         }
-        if (!viewModel.isInicaadaBaraja){
-            //baraja = BarajaDeCartas(instance, 0f, 0f, anchuraCarta)
+        if (!viewModel.isInicaadaBaraja) {
             viewModel.baraja = BarajaDeCartas(instance, 0f, 0f, anchuraCarta)
             viewModel.isInicaadaBaraja = true
-            //baraja = viewModel.baraja
         }
 
-        viewModel.jugador1.cartasQueTiene.forEachIndexed  {index, it ->
-            it.BlackJackActivity= instance
+        viewModel.jugador1.cartasQueTiene.forEachIndexed { index, it ->
+            it.BlackJackActivity = instance
             // Obtener el parent actual de la vista
             val currentParent = it.view.parent as? ViewGroup
 
@@ -800,17 +838,17 @@ class BlackJackActivity : AppCompatActivity() {
             val layoutParams = it.view.layoutParams
             //layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
             layoutParams.width = anchuraCarta
-            layoutParams.height = (1.46*layoutParams.width).toInt()
+            layoutParams.height = (1.46 * layoutParams.width).toInt()
             it.view.layoutParams = layoutParams
 
             var coordX = (labelPuntosJugador.x + index * it.view.width / 2.5).toFloat()
             var coordY = labelPuntosJugador.y - it.view.height - index * it.view.height / 4
 
-            it.setCoordYRotacion(coordX,coordY, 0f)
+            it.setCoordYRotacion(coordX, coordY, 0f)
         }
 
-        viewModel.crupier.cartasQueTiene.forEachIndexed  {index, it ->
-            it.BlackJackActivity= instance
+        viewModel.crupier.cartasQueTiene.forEachIndexed { index, it ->
+            it.BlackJackActivity = instance
             // Obtener el parent actual de la vista
             val currentParent = it.view.parent as? ViewGroup
 
@@ -822,33 +860,31 @@ class BlackJackActivity : AppCompatActivity() {
 
             val layoutParams = it.view.layoutParams
             layoutParams.width = anchuraCarta
-            layoutParams.height = (1.46*layoutParams.width).toInt()
+            layoutParams.height = (1.46 * layoutParams.width).toInt()
             it.view.layoutParams = layoutParams
 
             var coordX: Float
             var coordY: Float
 
-            if (index==0){
-                coordX = (labelPuntosCrupier.x + labelPuntosCrupier.width*2).toFloat()
-            }else{
-                coordX = (viewModel.crupier.cartasQueTiene.get(index-1).getX() + it.view.width / 2.5).toFloat()
+            if (index == 0) {
+                coordX = (labelPuntosCrupier.x + labelPuntosCrupier.width * 2).toFloat()
+            } else {
+                coordX = (viewModel.crupier.cartasQueTiene.get(index - 1)
+                    .getX() + it.view.width / 2.5).toFloat()
             }
             coordY = labelPuntosCrupier.y
 
-            it.setCoordYRotacion(coordX,coordY, 0f)
+            it.setCoordYRotacion(coordX, coordY, 0f)
         }
 
-        viewModel.baraja.cartas.forEachIndexed  {index, it ->
+        viewModel.baraja.cartas.forEachIndexed { index, it ->
             val layoutParams = it.view.layoutParams
             layoutParams.width = anchuraCarta
-            layoutParams.height = (1.46*layoutParams.width).toInt()
+            layoutParams.height = (1.46 * layoutParams.width).toInt()
             it.view.layoutParams = layoutParams
         }
 
         viewModel.baraja.BlackJackActivity = instance
-
-
-
 
 
         viewModel.baraja?.setCoordYRotacionYDesplazo(
@@ -871,7 +907,8 @@ class BlackJackActivity : AppCompatActivity() {
             layoutParamsView.height = alturaFicha
             layoutParamsView.width = anchuraFicha
             textView.layoutParams = layoutParamsView
-            val y: Int = jPanelFichasEnApuesto.height - layoutParamsView.height - (i) % candFichEnCol * dispYfichas
+            val y: Int =
+                jPanelFichasEnApuesto.height - layoutParamsView.height - (i) % candFichEnCol * dispYfichas
             val x: Int = layoutParamsView.width * ((i) / candFichEnCol)
             setCoord(textView, x.toFloat(), y.toFloat())
             jPanelFichasEnApuesto.addView(textView)
@@ -909,9 +946,12 @@ class BlackJackActivity : AppCompatActivity() {
             textView.layoutParams = viewModel.labelsFichasEnApuesto.get(i).layoutParams
             textView.background = viewModel.labelsFichasEnApuesto.get(i).background
             textView.text = viewModel.labelsFichasEnApuesto.get(i).text
-            textView.translationY = viewModel.labelsFichasEnApuesto.get(i).translationY - alturaFicha - dispYfichas*candFichEnCol
+            textView.translationY =
+                viewModel.labelsFichasEnApuesto.get(i).translationY - alturaFicha - dispYfichas * candFichEnCol
             textView.translationX =
-                viewModel.labelsFichasEnApuesto.get(i).translationX + viewModel.labelsFichasEnApuesto.get(i).width / 2
+                viewModel.labelsFichasEnApuesto.get(i).translationX + viewModel.labelsFichasEnApuesto.get(
+                    i
+                ).width / 2
         }
     }
 
@@ -943,10 +983,10 @@ class BlackJackActivity : AppCompatActivity() {
             mostrarMsg(mensajeTitulo, colorPierdes)
         }
         if (coeficienteDeGanancia > 1) {
-            if (coeficienteDeGanancia==2.5){
+            if (coeficienteDeGanancia == 2.5) {
                 soundPool.play(soundIdblackjack, 1f, 1f, 1, 0, 1f)
                 soundPool.play(soundIdganasfichas, 1f, 1f, 1, 0, 1f)
-            }else{
+            } else {
                 soundPool.play(soundIdtuganas, 1f, 1f, 1, 0, 1f)
                 soundPool.play(soundIdganasfichas2, 1f, 1f, 1, 0, 1f)
             }
@@ -968,7 +1008,7 @@ class BlackJackActivity : AppCompatActivity() {
         val originalX = viewToAnimate.translationX
         val originalY = viewToAnimate.translationY
         val newX = originalX
-        val newY = -jPanelFichasEnApuesto.height.toFloat()+imgFichasCrupier.height
+        val newY = -jPanelFichasEnApuesto.height.toFloat() + imgFichasCrupier.height
         val animX = ValueAnimator.ofFloat(originalX, newX)
         val animY = ValueAnimator.ofFloat(originalY, newY)
         animX.duration = duracion
@@ -998,8 +1038,8 @@ class BlackJackActivity : AppCompatActivity() {
         jPanelFichasEnCrupier.bringToFront()
         val originalX1 = jPanelFichasEnCrupier.translationX
         val originalY1 = jPanelFichasEnCrupier.translationY
-        val newX1 = (main.width/2).toFloat()
-        val newY1 = (main.height - jPanelFichasEnCrupier.height/2).toFloat()
+        val newX1 = (main.width / 2).toFloat()
+        val newY1 = (main.height - jPanelFichasEnCrupier.height / 2).toFloat()
         val animX1 = ValueAnimator.ofFloat(originalX1, newX1)
         val animY1 = ValueAnimator.ofFloat(originalY1, newY1)
         animX1.duration = duracion
@@ -1077,7 +1117,9 @@ class BlackJackActivity : AppCompatActivity() {
                             super.onAnimationEnd(animation)
                             //
                             crupier.cartasQueTiene.add(it)
-                            if (!(jugador1.isCrupier && jugador1.cartasQueTiene.size==2))it.abrirCerarCatra(duracionAbrirCartas)
+                            if (!(jugador1.isCrupier && jugador1.cartasQueTiene.size == 2)) it.abrirCerarCatra(
+                                duracionAbrirCartas
+                            )
 
                             if (crupier.sumaPuntos() < 17) {
                                 timerTurnoCrupier()
@@ -1124,15 +1166,8 @@ class BlackJackActivity : AppCompatActivity() {
         jPanelFichasEnCrupier.removeAllViews();
 
         if ((viewModel.baraja?.cartas?.size ?: 0) < (viewModel.baraja?.MIN_CARTAS ?: 0)) {
-            mostrarMsg("Nueva baraja!", colorComun)
-            soundPool.play(soundIdnuevabarajavoz, 1f, 1f, 1, 0, 1f)
-            soundPool.play(soundIdnuevabaraja2, 1f, 1f, 1, 0, 1f)
 
-            //baraja = BarajaDeCartas(instance, 0f, 0f, anchuraCarta)
-            viewModel.baraja = BarajaDeCartas(instance, 0f, 0f, anchuraCarta)
-            viewModel.isInicaadaBaraja = true
-            //baraja = viewModel.baraja
-            setBaraja()
+            nuevaBaraja()
 
         }
 
@@ -1140,6 +1175,17 @@ class BlackJackActivity : AppCompatActivity() {
         viewModel.isMas = false
         viewModel.isTurnoCrupier = false
         viewModel.isDoblar = false
+    }
+
+    private fun nuevaBaraja() {
+        mostrarMsg("Nueva baraja!", colorComun)
+        soundPool.play(soundIdnuevabarajavoz, 1f, 1f, 1, 0, 1f)
+        soundPool.play(soundIdnuevabaraja2, 1f, 1f, 1, 0, 1f)
+
+        viewModel.baraja = BarajaDeCartas(instance, 0f, 0f, anchuraCarta)
+        viewModel.isInicaadaBaraja = true
+
+        setBaraja()
     }
 
     fun addApuestoVisual(apuestoQuierePonel: Double, identDrowable: Int) {
@@ -1162,9 +1208,10 @@ class BlackJackActivity : AppCompatActivity() {
             textView.layoutParams = layoutParamsView
 
             val size = viewModel.labelsFichasEnApuesto.size
-            val y: Int = jPanelFichasEnApuesto.height - layoutParamsView.height - (size - 1) % candFichEnCol * dispYfichas
+            val y: Int =
+                jPanelFichasEnApuesto.height - layoutParamsView.height - (size - 1) % candFichEnCol * dispYfichas
             val x: Int = layoutParamsView.width * ((size - 1) / candFichEnCol)
-            setCoord(textView,x.toFloat(),y.toFloat())
+            setCoord(textView, x.toFloat(), y.toFloat())
 
         } else {
 
@@ -1205,13 +1252,13 @@ class BlackJackActivity : AppCompatActivity() {
 
         params.gravity = Gravity.CENTER_VERTICAL
         view.layoutParams = params
-        setCoord(view,main.width.toFloat(),0f)
+        setCoord(view, main.width.toFloat(), 0f)
         snackbar.show()
-        moverView(params.width.toFloat()+cornerRadius,0f,view,600)
+        moverView(params.width.toFloat() + cornerRadius, 0f, view, 600)
 
     }
 
-    fun moverView(newX:Float,newY:Float, view: View, duracion: Long): ValueAnimator? {
+    fun moverView(newX: Float, newY: Float, view: View, duracion: Long): ValueAnimator? {
 
         val viewToAnimate = view
         val originalX = viewToAnimate.translationX
@@ -1220,8 +1267,12 @@ class BlackJackActivity : AppCompatActivity() {
         val animY = ValueAnimator.ofFloat(originalY, newY)
         animX.duration = duracion
         animY.duration = duracion
-        animX.addUpdateListener {valAnim -> viewToAnimate.translationX = valAnim.animatedValue as Float}
-        animY.addUpdateListener {valAnim -> viewToAnimate.translationY =valAnim.animatedValue as Float}
+        animX.addUpdateListener { valAnim ->
+            viewToAnimate.translationX = valAnim.animatedValue as Float
+        }
+        animY.addUpdateListener { valAnim ->
+            viewToAnimate.translationY = valAnim.animatedValue as Float
+        }
         animX.start()
         animY.start()
 
@@ -1229,7 +1280,7 @@ class BlackJackActivity : AppCompatActivity() {
 
     }
 
-    private fun setTamano(objeto: Any, width:Int, height:Int) {
+    private fun setTamano(objeto: Any, width: Int, height: Int) {
         when (objeto) {
             is ViewGroup -> {
                 val layoutParamsView = objeto.layoutParams

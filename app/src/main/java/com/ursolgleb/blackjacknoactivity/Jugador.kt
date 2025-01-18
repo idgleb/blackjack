@@ -9,14 +9,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.marginBottom
 
 class Jugador(val nombre: String, var isCrupier: Boolean) {
-
-    val context = BlackJackActivity.obtenerContexto()
     val MIN_PUNTOS_PARA_DOBLAR: Int = 10
     val MAX_PUNTOS_PARA_DOBLAR: Int = 15
-    val MAX_CANTIDAD_CARTAS: Int = 12
     val APUESTO_MIN: Int = 100
     val APUESTO_MAX: Int = 2000
-    var balanceJugador: Double = 3000.0
+    var balanceJugador: Double = SharedApp.prefs.balanceJugador.toDouble()
     var apuestoJugador: Double = 0.0
     val cartasQueTiene = mutableListOf<Carta>()
 
