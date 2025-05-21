@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#004083"
+    android:background="@color/fondo"
     android:orientation="vertical"
     tools:context=".BlackJackActivity">
 
@@ -48,7 +48,7 @@
         android:translationX="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Puntos J"
+        tools:text="Puntos J"
         android:textColor="@color/white"
         android:textSize="18sp" />
 
@@ -58,7 +58,7 @@
         android:translationX="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PuntosC"
+        tools:text="PuntosC"
         android:textColor="@color/white"
         android:textSize="18sp"/>
 
@@ -103,7 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:text="info"
+            tools:text="info"
             android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@+id/imageInfo"
@@ -204,7 +204,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_margin="2dp"
-            android:text="Sacar fichas" />
+            android:text="@string/sacar_fichas" />
 
         <Button
             android:id="@+id/butSacarUna"
@@ -212,7 +212,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_margin="2dp"
-            android:text="Sacar una ficha" />
+            android:text="@string/sacar_una_ficha" />
 
     </LinearLayout>
 
@@ -222,7 +222,7 @@
         android:translationX="170dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="$$$$$$$"
+        tools:text="$$$$$$$"
         android:textColor="@color/yelow"
         android:textSize="18sp" />
 
@@ -241,7 +241,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
-            android:text="REPARTIR"
+            android:text="@string/repartir"
             android:textColor="@color/white" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -251,7 +251,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
-            android:text="МАS"
+            android:text="@string/s"
             android:textColor="@color/white" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -261,7 +261,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
-            android:text="PARAR"
+            android:text="@string/parar"
             android:textColor="@color/white" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -271,7 +271,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
-            android:text="DOBLAR"
+            android:text="@string/doblar"
             android:textColor="@color/white" />
 
     </LinearLayout>
@@ -283,9 +283,9 @@
         android:translationY="620dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#9E000F47"
+        android:background="#9E011200"
         android:padding="3dp"
-        android:text="Balance: "
+        android:text="@string/balance"
         android:textAlignment="textEnd"
         android:textColor="@color/white"
         android:textSize="19sp" />

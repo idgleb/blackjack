@@ -1,28 +1,109 @@
-# blackjack
- Juego Black Jack.
- El Black Jack es un juego de cartas muy popular en los casinos, también conocido como "21". El objetivo del juego es tener una mano cuyo valor total se acerque lo más posible a 21 puntos, sin excederse.
+# Black Jack Argentina 🃏
 
-Reglas Básicas:
-Cartas y Puntos: En el Black Jack, cada carta numérica (del 2 al 10) vale su valor nominal, las cartas con figuras (J, Q, K) valen 10 puntos, y el As puede valer 1 u 11 puntos, dependiendo de lo que más beneficie al jugador.
-Objetivo: El jugador compite contra el crupier (la banca), no contra otros jugadores. El objetivo es tener una mano con un valor más cercano a 21 que la del crupier, sin pasarse.
-Juego: Al comenzar, tanto el jugador como el crupier reciben dos cartas. El jugador puede "pedir" más cartas ("hit") o quedarse con las que tiene ("stand"). Si el total de puntos supera 21, el jugador pierde automáticamente.
-Black Jack: Si en las dos primeras cartas el jugador tiene un As y una carta que vale 10 puntos (como una figura o un 10), se considera un "Black Jack", que normalmente es una mano ganadora a menos que el crupier también lo tenga.
-El Black Jack es un juego de azar que también implica estrategia, ya que los jugadores deciden cuándo pedir más cartas o cuándo quedarse. También existen opciones como "doblar la apuesta" o "dividir" si se tienen dos cartas del mismo valor. El juego es muy popular por su combinación de suerte y habilidad.
+![Banner](https://via.placeholder.com/1200x200.png?text=Black+Jack+Argentina+-+Juega+y+Gana)  
+**🌐 Una aplicación Android para disfrutar del clásico juego de Blackjack con estilo argentino.**
 
-![3](https://github.com/user-attachments/assets/58d20613-358e-437c-960c-1b8105519aac)
+## ✨ Descripción
 
-Blackjack Game: Blackjack is a very popular card game in casinos, also known as "21". The objective of the game is to have a hand whose total value is as close as possible to 21 points without exceeding it.
+**Black Jack Argentina** es una aplicación Android que te permite jugar al Blackjack contra un crupier virtual. Apuesta fichas, pide cartas, y disfruta de animaciones y sonidos envolventes. Construida con Kotlin, incluye música de fondo, persistencia de saldo, y un diseño fullscreen para una experiencia inmersiva.
 
-Basic Rules: Cards and Points: In Blackjack, each numbered card (from 2 to 10) is worth its face value, face cards (J, Q, K) are worth 10 points, and an Ace can be worth 1 or 11 points, depending on what benefits the player the most.
-Objective: The player competes against the dealer, not other players. The goal is to have a hand closer to 21 than the dealer's hand without going over.
-Gameplay: At the start, both the player and the dealer receive two cards. The player can "hit" (ask for more cards) or "stand" (keep the current hand). If the total exceeds 21 points, the player automatically loses.
-Blackjack: If the player gets an Ace and a 10-point card (such as a face card or a 10) in the first two cards, it is called "Blackjack", which usually wins unless the dealer also has Blackjack.
-Blackjack is a game of chance that also involves strategy, as players decide when to ask for more cards or when to stand. There are also options like "doubling down" or "splitting" if the player has two cards of the same value. The game is very popular because of its combination of luck and skill.
+🎮 **Descárgala en Google Play**: [Black Jack Argentina](https://play.google.com/store/apps/details?id=com.ursolgleb.blackjacknoactivity)
 
-Игра Блэкджек: Блэкджек — это очень популярная карточная игра в казино, также известная как "21". Цель игры — собрать комбинацию карт, чья сумма максимально приближена к 21 очку, не превышая его.
+---
 
-Основные правила: Карты и Очки: В блэкджеке каждая числовая карта (от 2 до 10) имеет номинальную стоимость, карты с картинками (J, Q, K) стоят 10 очков, а туз может стоить 1 или 11 очков, в зависимости от того, что выгоднее игроку.
-Цель: Игрок соревнуется против дилера (банка), а не против других игроков. Цель — собрать комбинацию ближе к 21, чем у дилера, не превысив 21 очко.
-Игра: В начале игры и игрок, и дилер получают по две карты. Игрок может "взять ещё" (hit) или "остаться" с текущими картами (stand). Если сумма очков превышает 21, игрок автоматически проигрывает.
-Блэкджек: Если игрок получает туза и карту стоимостью 10 очков (например, карту с картинкой или десятку) в первых двух картах, это называется "Блэкджек", который обычно является выигрышной комбинацией, если только дилер не имеет такого же.
-Блэкджек — это игра на удачу, которая также включает в себя стратегию, так как игроки решают, когда брать дополнительные карты или когда оставаться. Также существуют такие опции, как "удвоение ставки" или "разделение", если у игрока две карты одного номинала. Игра популярна благодаря сочетанию удачи и навыков.
+## 🚀 Características
+
+- 🃏 **Juego clásico**: Compite contra el crupier para acercarte a 21 sin pasarte.
+- 💰 **Apuestas**: Usa fichas (10, 25, 50, 100, 500) con límites de apuesta (mín. 100, máx. 2000).
+- 👆 **Acciones**: Elige "Hit" (pedir carta), "Stand" (plantarte), o "Double Down" (doblar apuesta).
+- 🎶 **Sonidos y música**: Efectos para cada acción y música de fondo (jazz).
+- 🎥 **Animaciones**: Cartas flotantes y movimiento de fichas.
+- 💾 **Persistencia**: Guarda tu saldo con SharedPreferences.
+- 📱 **Fullscreen**: Interfaz inmersiva sin barras de navegación.
+
+---
+
+## 🛠️ Requisitos
+
+- 📱 Android 5.0+ (API 21 o superior)
+- 🛠️ Android Studio (para desarrollo)
+- 🌐 Conexión a internet (para descargar desde Google Play)
+
+---
+
+## ⚙️ Instalación (para desarrollo)
+
+1. **Clona el repositorio** 📥:
+   ```bash
+   git clone https://github.com/idgleb/blackjack.git
+   cd blackjack
+   ```
+
+2. **Abre en Android Studio** 🛠️:
+ - Importa el proyecto en Android Studio.
+ - Sincroniza las dependencias con Gradle.
+
+3. **Configura un emulador o dispositivo** 📱:
+ - Usa un emulador Android o conecta un dispositivo físico.
+
+4. **Ejecuta la app** 🚀:
+ - Haz clic en "Run" en Android Studio.
+
+---
+
+## 📖 Uso
+
+1. **Inicia el juego** 🃏:
+ - Comienzas con un saldo de $3000.
+
+2. **Apuesta fichas** 💰:
+ - Selecciona fichas (10, 25, 50, 100, 500) y haz clic en "Repartir".
+
+3. **Juega contra el crupier** 🎮:
+ - Recibes 2 cartas iniciales.
+ - Elige "Hit" (pedir carta), "Stand" (plantarte), o "Double Down" (si tienes entre 10 y 15 puntos).
+ - El crupier juega automáticamente (se planta en 17 o más).
+
+4. **Gana o pierde** 🏆:
+ - Ganas si te acercas más a 21 que el crupier sin pasarte.
+ - Blackjack (21 con 2 cartas) paga 2.5x tu apuesta.
+ - Empate devuelve tu apuesta.
+
+---
+
+## 🧑‍💻 Tecnologías
+
+- 🟪 Kotlin
+- 📱 Android SDK
+- 🎶 SoundPool y MediaPlayer (sonidos y música)
+- 🖼️ ConstraintLayout (interfaz)
+- 🧠 ViewModel (gestión de estado)
+- 💾 SharedPreferences (persistencia)
+
+---
+
+## 🤝 Contribuir
+
+1. Fork 🍴.
+2. Crea rama (`git checkout -b feature/nueva-funcionalidad`) 🌿.
+3. Commitea (`git commit -m "Añadir funcionalidad"`) ✅.
+4. Push (`git push origin feature/nueva-funcionalidad`) 🚀.
+5. Abre Pull Request 📬.
+
+---
+
+## 📜 Licencia
+
+**[MIT](LICENSE)** 📝.
+
+---
+
+## 📬 Contacto
+
+- 🐞 Issues: [GitHub](https://github.com/idgleb/blackjack/issues)
+- ✉️ Email: [argentinagleb73@gmail.com](mailto:argentinagleb73@gmail.com)
+- 🔗 LinkedIn: [Gleb Ursol](https://www.linkedin.com/in/gleb-ursol-855725326/)
+
+---
+
+🌟 **¡Juega y disfruta con Black Jack Argentina!** 🌟

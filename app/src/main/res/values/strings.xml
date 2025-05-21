@@ -2,4 +2,11 @@
     <string name="app_name">BlackJack Argentina</string>
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="balance">Balance:</string>
+    <string name="doblar">DOBLAR</string>
+    <string name="parar">PARAR</string>
+    <string name="s">МÁS</string>
+    <string name="repartir">REPARTIR</string>
+    <string name="sacar_una_ficha">Sacar una ficha</string>
+    <string name="sacar_fichas">Sacar fichas</string>
 </resources>
