@@ -2,6 +2,17 @@
 
 **🌐 Una aplicación Android para disfrutar del clásico juego de Blackjack con estilo argentino.**
 
+<div style="display: flex;" align="center">
+  <img src="https://github.com/user-attachments/assets/6a2c5f33-41a9-4369-8b03-450c67a865a7" style="width: 35%;" />
+  <img src="https://github.com/user-attachments/assets/3ed7bbfc-bdca-4bf1-9150-648b0fea50c1" style="width: 35%;"/>
+</div>
+
+<div style="display: flex;" align="center">
+  <img src="https://github.com/user-attachments/assets/4b37c71c-39e5-44de-b944-50e20e394cae" style="width: 55%;" />
+</div>
+
+
+
 ## ✨ Descripción
 
 **Black Jack Argentina** es una aplicación Android que te permite jugar al Blackjack contra un crupier virtual. Apuesta fichas, pide cartas, y disfruta de animaciones y sonidos envolventes. Construida con Kotlin, incluye música de fondo, persistencia de saldo, y un diseño fullscreen para una experiencia inmersiva.
