@@ -1,6 +1,5 @@
 # Black Jack Argentina 🃏
 
-![Banner](https://via.placeholder.com/1200x200.png?text=Black+Jack+Argentina+-+Juega+y+Gana)  
 **🌐 Una aplicación Android para disfrutar del clásico juego de Blackjack con estilo argentino.**
 
 ## ✨ Descripción
