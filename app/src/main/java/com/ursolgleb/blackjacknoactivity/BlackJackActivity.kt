@@ -120,6 +120,9 @@ class BlackJackActivity : AppCompatActivity() {
 
     lateinit var popupWindow: PopupWindow
 
+    private var timerSiempre: CountDownTimer? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -234,7 +237,7 @@ class BlackJackActivity : AppCompatActivity() {
         //////////
 
 
-        var timerSiempre: CountDownTimer? = null
+
         fun startTimerSiempre(timeMillis: Long) {
             timerSiempre = object : CountDownTimer(timeMillis, 5) {
                 override fun onTick(p0: Long) {
@@ -509,6 +512,8 @@ class BlackJackActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        // Cancel the timer to avoid callbacks after the activity is destroyed
+        timerSiempre?.cancel()
         // Liberar recursos del MediaPlayer
         if (this::mediaPlayer.isInitialized) {
             mediaPlayer.release()
