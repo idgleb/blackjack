@@ -171,6 +171,7 @@ class BlackJackActivity : AppCompatActivity() {
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_GAME)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
             .build()
         soundPool = SoundPool.Builder()
             .setMaxStreams(25)  // Número máximo de sonidos simultáneos
