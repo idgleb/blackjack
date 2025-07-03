@@ -8,7 +8,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.ursolgleb.blackjacknoactivity"
+        applicationId = "com.ursolgleb.blackjack"
         minSdk = 23
         targetSdk = 35
         versionCode = 3
